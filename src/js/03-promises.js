@@ -8,12 +8,14 @@ const refs = {
   btnSubmit: document.querySelector('button'),
 };
 
+let asd = null;
+
 refs.btnSubmit.addEventListener('click', onBtnSubmitClick);
 
-function createPromise(position, delay) {
+function createPromise(position, firstDelay) {
   const obj = {
     position,
-    delay,
+    firstDelay,
   };
 
   return new Promise((resolve, reject) => {
@@ -24,22 +26,21 @@ function createPromise(position, delay) {
       } else {
         reject(obj);
       }
-    }, delay);
+    }, firstDelay);
   });
 }
 
 function onBtnSubmitClick(e) {
   e.preventDefault();
 
-  setTimeout(() => {
-    for (let i = 1; i <= refs.amount.value; i += 1) {
-      createPromise(i, refs.step.value * i)
-        .then(({ position, delay }) => {
-          Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
-        })
-        .catch(({ position, delay }) => {
-          Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
-        });
-    }
-  }, refs.firstDelay.value);
+  for (let i = 0; i < refs.amount.value; i += 1) {
+    let delay = Number(refs.firstDelay.value) + Number(refs.step.value * i);
+    createPromise(i + 1, delay)
+      .then(({ position, firstDelay }) => {
+        Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
+      })
+      .catch(({ position, firstDelay }) => {
+        Notify.failure(`❌ Rejected promise ${position} in ${firstDelay}ms`);
+      });
+  }
 }
